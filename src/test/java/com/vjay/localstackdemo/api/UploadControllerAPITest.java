@@ -1,7 +1,6 @@
 package com.vjay.localstackdemo.api;
 
 import com.amazonaws.services.s3.AmazonS3;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.testcontainers.containers.localstack.LocalStackContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -41,9 +42,9 @@ public class UploadControllerAPITest {
     @Autowired
     private AmazonS3 s3Client;
 
-    @BeforeAll
-    static void beforeAll() {
-        System.setProperty("spring.cloud.aws.credentials.access-key", localStackContainer.getAccessKey());
+    @DynamicPropertySource
+    static void awsProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.cloud.aws.credentials.access-key", localStackContainer::getAccessKey);
         System.setProperty("spring.cloud.aws.credentials.secret-key", localStackContainer.getSecretKey());
         System.setProperty("spring.cloud.aws.s3.region", localStackContainer.getRegion());
         System.setProperty("cloud.aws.s3.endpoint", localStackContainer.getEndpointOverride(LocalStackContainer.Service.S3).toString());
